@@ -1,7 +1,7 @@
 import type React from "react"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-import { currentUser } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs"
 import { redirect } from "next/navigation"
 
 export default async function DashboardLayout({
@@ -10,9 +10,9 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   try {
-    const user = await currentUser()
-
-    if (!user) {
+    const { userId } = auth()
+    
+    if (!userId) {
       redirect("/sign-in?reason=unauthorized")
     }
 
