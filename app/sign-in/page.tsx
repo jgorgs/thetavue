@@ -24,13 +24,12 @@ export default function SignInPage() {
               dividerText: "text-muted-foreground",
             },
           }}
-          routing="path"
-          path="/sign-in"
+          routing="hash"
           signUpUrl="/sign-up"
-          afterSignInUrl="/dashboard"
+          redirectUrl="/dashboard"
+          forceRedirectUrl="/dashboard"
         />
       </div>
     </div>
   )
-}
-
+} 
