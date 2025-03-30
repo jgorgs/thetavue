@@ -1,7 +1,7 @@
 import type React from "react"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-import { auth } from "@clerk/nextjs"
+import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 
 export default async function DashboardLayout({
