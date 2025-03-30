@@ -17,14 +17,17 @@ export default function SignInPage() {
               card: "bg-transparent shadow-none w-full",
               headerTitle: "text-2xl font-bold",
               headerSubtitle: "text-muted-foreground",
-              formButtonPrimary: "bg-primary hover:bg-primary/90",
+              formButtonPrimary: "bg-purple-500 hover:bg-purple-600",
               formFieldInput: "bg-background border-border",
-              footerActionLink: "text-primary hover:text-primary/90",
+              footerActionLink: "text-purple-500 hover:text-purple-600",
               dividerLine: "bg-border",
               dividerText: "text-muted-foreground",
             },
           }}
-          redirectUrl="/dashboard"
+          routing="path"
+          path="/sign-in"
+          signUpUrl="/sign-up"
+          afterSignInUrl="/dashboard"
         />
       </div>
     </div>
