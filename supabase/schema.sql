@@ -3,21 +3,53 @@
 -- Enable Row Level Security
 ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
 
--- Users table
-CREATE TABLE IF NOT EXISTS public.users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
-  email TEXT NOT NULL,
-  display_name TEXT,
-  tastytrade_connected BOOLEAN DEFAULT FALSE NOT NULL,
-  tastytrade_token TEXT,
-  tastytrade_refresh_token TEXT,
-  tastytrade_token_expires_at TIMESTAMP WITH TIME ZONE,
-  default_benchmark TEXT DEFAULT 'spy' NOT NULL,
-  sync_frequency INTEGER DEFAULT 15 NOT NULL,
-  data_retention TEXT DEFAULT '2years' NOT NULL
+-- Create a custom type for user roles
+CREATE TYPE user_role AS ENUM ('user', 'admin');
+
+-- Enable the pgcrypto extension for UUID generation
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Create the users table
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    role user_role DEFAULT 'user',
+    clerk_data JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
+
+-- Enable Row Level Security
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Users can view their own data" ON users
+    FOR SELECT
+    USING (auth.uid() = id);
+
+CREATE POLICY "Users can update their own data" ON users
+    FOR UPDATE
+    USING (auth.uid() = id);
+
+-- Create an index on email for faster lookups
+CREATE INDEX IF NOT EXISTS users_email_idx ON users(email);
+
+-- Function to automatically update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = TIMEZONE('utc'::text, NOW());
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Create trigger to automatically update updated_at
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- Positions table
 CREATE TABLE IF NOT EXISTS public.positions (
@@ -91,13 +123,6 @@ ALTER TABLE public.trade_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.portfolio_metrics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sync_logs ENABLE ROW LEVEL SECURITY;
 
--- Users can only access their own data
-CREATE POLICY "Users can view their own data" ON public.users
-  FOR SELECT USING (auth.uid() = id);
-
-CREATE POLICY "Users can update their own data" ON public.users
-  FOR UPDATE USING (auth.uid() = id);
-
 -- Positions policies
 CREATE POLICY "Users can view their own positions" ON public.positions
   FOR SELECT USING (auth.uid() = user_id);
@@ -149,26 +174,4 @@ CREATE INDEX IF NOT EXISTS trade_plans_user_id_idx ON public.trade_plans (user_i
 CREATE INDEX IF NOT EXISTS portfolio_metrics_user_id_idx ON public.portfolio_metrics (user_id);
 CREATE INDEX IF NOT EXISTS portfolio_metrics_date_idx ON public.portfolio_metrics (date);
 CREATE INDEX IF NOT EXISTS sync_logs_user_id_idx ON public.sync_logs (user_id);
-
--- Create functions for automatic updated_at timestamp
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Create triggers for automatic updated_at timestamp
-CREATE TRIGGER update_users_updated_at
-BEFORE UPDATE ON public.users
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_positions_updated_at
-BEFORE UPDATE ON public.positions
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_trade_plans_updated_at
-BEFORE UPDATE ON public.trade_plans
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
