@@ -1,16 +1,17 @@
-import { authMiddleware } from "@clerk/nextjs"
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
 
-export default authMiddleware({
-  // Ensure the user is redirected to the correct page after sign in
-  afterSignInUrl: "/dashboard",
-  afterSignUpUrl: "/onboarding",
-  publicRoutes: [
-    "/",
-    "/sign-in(.*)",
-    "/sign-up(.*)",
-    "/api/clerk-webhook",
-    "/api/health",
-  ],
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/api/clerk-webhook",
+  "/api/health",
+])
+
+export default clerkMiddleware(async (auth, request) => {
+  if (!isPublicRoute(request)) {
+    await auth.protect()
+  }
 })
 
 export const config = {
