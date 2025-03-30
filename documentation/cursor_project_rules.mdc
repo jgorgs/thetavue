@@ -1,0 +1,112 @@
+---
+description: Apply these rules when creating the project
+globs:
+alwaysApply: true
+---
+## Project Overview
+
+*   **Type:** Portfolio Management Application for Options Traders
+*   **Description:** ThetaVue is a portfolio management application designed for options traders using a Tastytrade-inspired approach. It helps traders create and adhere to trading plans, track performance, and gain insights into their strategies with a focus on premium-selling options.
+*   **Primary Goal:** "Plan Smart. Profit Consistently." - Enable traders to manage portfolios effectively by linking trade plans to real results, simplifying complex data, and eliminating guesswork.
+
+## Project Structure
+
+### Framework-Specific Routing
+
+*   **Directory Rules:**
+
+    *   **Next.js 14 (App Router):** Enforce the use of the `app/` directory structure with nested route folders following the `app/[route]/page.tsx` convention.
+    *   Example 1: "Next.js 14 (App Router)" → `app/[route]/page.tsx` conventions
+    *   Example 2: "Next.js (Pages Router)" → `pages/[route].tsx` pattern
+    *   Example 3: "React Router 6" → `src/routes/` with `createBrowserRouter`
+
+### Core Directories
+
+*   **Versioned Structure:**
+
+    *   **app/api:** Next.js 14 API routes implemented with Route Handlers for backend integration
+    *   **app/auth:** Houses authentication logic (Clerk integration) and server actions
+    *   **app/dashboard:** Contains root layouts and views for the portfolio dashboard
+    *   Example 1: `app/api` → "Next.js 14 API routes with Route Handlers"
+    *   Example 2: `src/views` → "Vue 3 composition API components" (not applicable here)
+
+### Key Files
+
+*   **Stack-Versioned Patterns:**
+
+    *   **app/dashboard/layout.tsx:** Next.js 14 root layout structure providing consistent UI scaffolding
+    *   **app/auth/login/page.tsx:** Authentication page utilizing server components for secure login flows
+    *   Example 1: `app/dashboard/layout.tsx` → "Next.js 14 root layouts"
+    *   Example 2: `pages/_app.js` → "Next.js Pages Router customization" (not used in this App Router project)
+
+## Tech Stack Rules
+
+*   **Version Enforcement:**
+
+    *   **next@14:** App Router is required. Do not use legacy methods like `getInitialProps`; instead, rely on server actions and modern data fetching patterns.
+    *   **typescript@latest:** Ensure strict typing and interface usage throughout the project.
+    *   **tailwindcss@latest:** Configure for dark mode with glassmorphism design utilities and responsive design setups.
+
+## PRD Compliance
+
+*   **Non-Negotiable:**
+
+    *   "Plan Smart. Profit Consistently." - The application must adhere to goal-driven portfolio management practices, including robust error handling (caching, retry logic, user notifications) and real-time integration with Tastytrade API data every 15 minutes.
+
+## App Flow Integration
+
+*   **Stack-Aligned Flow:**
+
+    *   Example: "Next.js 14 Auth Flow → `app/auth/login/page.tsx` uses server actions for secure authentication via Clerk and JWT handling."
+
+## Best Practices
+
+*   **Next.js 14 (App Router)**
+
+    *   Utilize file-based routing and nested directories to keep the codebase organized.
+    *   Leverage server components and actions for improved performance and secure data fetching.
+    *   Emphasize modular component design for reusability and easier maintenance.
+
+*   **TypeScript**
+
+    *   Enforce strict typing and use interfaces for props and state.
+    *   Implement type-safe API calls and error handling.
+    *   Maintain consistency in coding standards and linting rules across the project.
+
+*   **Tailwind CSS**
+
+    *   Configure dark mode and custom themes to support glassmorphism elements.
+    *   Use utility-first classes to ensure responsive and maintainable styling.
+    *   Regularly update and purge unused styles to optimize performance.
+
+*   **Tremor UI Components**
+
+    *   Adhere to accessibility best practices for interactive components.
+    *   Use pre-built components to speed up development while customizing for the dark mode palette.
+    *   Ensure that components seamlessly integrate with Next.js server-side rendering.
+
+*   **Recharts/D3.js & Cal-Heatmap**
+
+    *   Optimize data visualization for performance and responsiveness.
+    *   Ensure that charts and calendars load efficiently even with large datasets.
+    *   Provide interactivity (tooltips, legends) that is both informative and accessible.
+
+*   **Clerk**
+
+    *   Leverage Clerk's secure authentication workflows including multi-factor authentication.
+    *   Ensure proper JWT handling and integration with Supabase’s Row Level Security.
+    *   Follow best practices for session management and error logging.
+
+*   **Supabase**
+
+    *   Implement row-level security and encrypt sensitive API credentials.
+    *   Use real-time subscriptions and caching mechanisms for performance improvements.
+    *   Follow best practices in database schema design for scalability and maintainability.
+
+## Rules
+
+*   Derive folder/file patterns directly from techStackDoc versions.
+*   If Next.js 14 App Router: Enforce `app/` directory with nested route folders.
+*   If Pages Router: Use `pages/*.tsx` flat structure.
+*   Mirror this logic for React Router, SvelteKit, etc.
+*   Never mix version patterns (e.g., no `pages/` in App Router projects).
