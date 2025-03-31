@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { signIn } from '@/lib/supabase'
+import { createClientSupabaseClient } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,7 +24,11 @@ export default function SignIn() {
     setError(null)
 
     try {
-      const { data, error } = await signIn(email, password)
+      const supabase = createClientSupabaseClient()
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
       
       if (error) {
         throw error
@@ -54,10 +58,10 @@ export default function SignIn() {
   }
 
   return (
-    <Card className="w-full border bg-card text-card-foreground shadow-sm">
+    <Card className="w-full border bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl">Welcome back</CardTitle>
-        <CardDescription>Enter your credentials to access your account</CardDescription>
+        <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
+        <CardDescription>Enter your email and password to access your account</CardDescription>
       </CardHeader>
       <form onSubmit={handleSignIn}>
         <CardContent className="space-y-4">
@@ -75,7 +79,7 @@ export default function SignIn() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-background"
+              className="bg-background/50 backdrop-blur-sm"
               disabled={loading}
             />
           </div>
@@ -87,7 +91,7 @@ export default function SignIn() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-background"
+              className="bg-background/50 backdrop-blur-sm"
               disabled={loading}
             />
           </div>
@@ -95,16 +99,15 @@ export default function SignIn() {
         <CardFooter className="flex flex-col space-y-2">
           <Button 
             type="submit" 
-            className="w-full" 
+            className="w-full bg-primary hover:bg-primary/90" 
             disabled={loading}
-            variant="default"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Signing in...' : 'Sign in'}
           </Button>
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full bg-card/50 hover:bg-card/80 backdrop-blur-sm"
             onClick={() => router.push('/auth/sign-up')}
             disabled={loading}
           >
