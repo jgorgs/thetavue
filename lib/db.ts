@@ -1,6 +1,11 @@
-import { supabase } from "./supabase"
+import { createClient } from '@supabase/supabase-js'
 import { auth } from "@clerk/nextjs/server"
 import type { Database } from "@/types/supabase"
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 type User = Database["public"]["Tables"]["users"]["Row"]
 type Position = Database["public"]["Tables"]["positions"]["Row"]
@@ -29,48 +34,12 @@ export async function getUser() {
 }
 
 // Simplified version of createOrUpdateUser
-export async function createOrUpdateUser(userData: Partial<User>) {
-  const { userId } = auth()
-  if (!userId || !supabase) return null
+export async function createOrUpdateUser(userId: string, data: any) {
+  const { error } = await supabase
+    .from('users')
+    .upsert({ id: userId, ...data })
 
-  try {
-    // Check if user exists
-    const { data: existingUser } = await supabase.from("users").select("id").eq("id", userId).single()
-
-    if (existingUser) {
-      // Update existing user
-      const { data, error } = await supabase
-        .from("users")
-        .update({ ...userData, updated_at: new Date().toISOString() })
-        .eq("id", userId)
-        .select()
-        .single()
-
-      if (error) {
-        console.error("Error updating user:", error)
-        return null
-      }
-
-      return data
-    } else {
-      // Create new user
-      const { data, error } = await supabase
-        .from("users")
-        .insert([{ id: userId, ...userData }])
-        .select()
-        .single()
-
-      if (error) {
-        console.error("Error creating user:", error)
-        return null
-      }
-
-      return data
-    }
-  } catch (error) {
-    console.error("Unexpected error in createOrUpdateUser:", error)
-    return null
-  }
+  if (error) throw error
 }
 
 // Position operations
@@ -285,22 +254,16 @@ export async function getSyncLogs(limit = 10): Promise<SyncLog[]> {
   return data || []
 }
 
-export async function createSyncLog(log: Omit<SyncLog, "id" | "created_at" | "user_id">): Promise<SyncLog | null> {
-  const { userId } = auth()
-  if (!userId) return null
+export async function createSyncLog(data: {
+  status: string
+  message: string
+  details?: any
+}) {
+  const { error } = await supabase
+    .from('sync_logs')
+    .insert([data])
 
-  const { data, error } = await supabase
-    .from("sync_logs")
-    .insert([{ ...log, user_id: userId }])
-    .select()
-    .single()
-
-  if (error) {
-    console.error("Error creating sync log:", error)
-    return null
-  }
-
-  return data
+  if (error) throw error
 }
 
 // Portfolio Summary

@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { createOrUpdateUser, createSyncLog } from "@/lib/db"
 import { revalidatePath } from "next/cache"
+import { getUser } from "@/lib/supabase-server"
 
 // This is a placeholder for the actual Tastytrade API integration
 // In a real implementation, you would use the Tastytrade API client
@@ -62,41 +63,17 @@ export async function connectTastytrade(code: string) {
 }
 
 export async function syncTastytrade() {
-  const { userId } = auth()
-  if (!userId) {
-    return { success: false, error: "Not authenticated" }
-  }
-
   try {
-    // In a real implementation, you would fetch data from the Tastytrade API
-    // and update the database with the latest positions and metrics
+    const user = await getUser()
+    if (!user) {
+      return { success: false, error: "Not authenticated" }
+    }
 
-    // Log the successful sync
-    await createSyncLog({
-      status: "success",
-      message: "Successfully synced data from Tastytrade",
-    })
-
-    revalidatePath("/dashboard")
-    revalidatePath("/dashboard/portfolio")
-    revalidatePath("/dashboard/analytics")
-    revalidatePath("/dashboard/activity")
-
+    // TODO: Implement Tastytrade sync logic
     return { success: true }
   } catch (error) {
     console.error("Error syncing Tastytrade data:", error)
-
-    // Log the error
-    await createSyncLog({
-      status: "error",
-      message: "Failed to sync data from Tastytrade",
-      details: { error: String(error) },
-    })
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    }
+    return { success: false, error: "Failed to sync data" }
   }
 }
 

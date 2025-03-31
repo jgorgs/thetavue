@@ -1,78 +1,57 @@
 "use client"
 
-import { useState } from "react"
-import { UserButton } from "@clerk/nextjs"
-import { Bell, RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
-import { syncTastytrade } from "@/app/actions/tastytrade"
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { signOut } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
-interface HeaderProps {
-  lastSyncTime?: string
-}
+export function Header() {
+  const router = useRouter()
 
-export function Header({ lastSyncTime = "15 minutes ago" }: HeaderProps) {
-  const [isSyncing, setIsSyncing] = useState(false)
-  const { toast } = useToast()
-
-  const handleRefresh = async () => {
-    setIsSyncing(true)
-
-    toast({
-      title: "Syncing data",
-      description: "Fetching the latest data from Tastytrade...",
-    })
-
-    try {
-      const result = await syncTastytrade()
-
-      if (result.success) {
-        toast({
-          title: "Sync completed",
-          description: "Your data has been updated successfully.",
-        })
-      } else {
-        toast({
-          title: "Sync failed",
-          description: result.error || "Failed to sync data from Tastytrade.",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Sync failed",
-        description: "An unexpected error occurred.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSyncing(false)
-    }
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/auth/sign-in')
   }
 
   return (
-    <header className="glass flex h-16 items-center justify-between px-6">
-      <div>
-        <h1 className="text-xl font-bold">Dashboard</h1>
-      </div>
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Last synced: {lastSyncTime}</span>
-          <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isSyncing}>
-            <RefreshCw className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
-          </Button>
-        </div>
-        <Button variant="ghost" size="icon">
-          <Bell className="h-5 w-5" />
+    <div className="flex h-16 items-center border-b px-4">
+      <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-6 w-6"
+        >
+          <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+        </svg>
+        ThetaVue
+      </Link>
+      <div className="ml-auto flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={handleSignOut}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span className="sr-only">Sign out</span>
         </Button>
-        <UserButton
-          appearance={{
-            elements: {
-              userButtonAvatarBox: "w-8 h-8",
-            },
-          }}
-        />
       </div>
-    </header>
+    </div>
   )
 }
 
