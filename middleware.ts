@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -39,17 +39,20 @@ export async function middleware(request: NextRequest) {
 
   try {
     // Refresh session if expired
-    await supabase.auth.getSession()
-
-    // Optional: Get user data
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
 
     // If user is not signed in and the current path is not /auth,
     // redirect the user to /auth/sign-in
-    if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
-      return NextResponse.redirect(new URL('/auth/sign-in', request.url))
+    if (!session && !request.nextUrl.pathname.startsWith('/auth')) {
+      const redirectUrl = new URL('/auth/sign-in', request.url)
+      redirectUrl.searchParams.set('next', request.nextUrl.pathname)
+      return NextResponse.redirect(redirectUrl)
+    }
+
+    // If user is signed in and trying to access auth pages,
+    // redirect them to the dashboard
+    if (session && request.nextUrl.pathname.startsWith('/auth')) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     return response
@@ -69,8 +72,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
-     * - auth routes
      */
-    '/((?!_next/static|_next/image|favicon.ico|public|auth).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public).*)',
   ],
 } 
