@@ -1,7 +1,7 @@
 import { getServerUser } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-import Header from '@/components/dashboard/header'
-import Sidebar from '@/components/dashboard/sidebar'
+import { Header } from '@/components/dashboard/header'
+import { Sidebar } from '@/components/dashboard/sidebar'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getServerUser()

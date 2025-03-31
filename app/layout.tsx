@@ -1,13 +1,13 @@
-import { Inter } from 'next/font/google'
-import { Toaster } from '@/components/ui/toaster'
-import { ThemeProvider } from '@/components/theme-provider'
-import './globals.css'
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { ClientWrapper } from "@/components/dashboard/client-wrapper"
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] })
 
-export const metadata = {
-  title: 'ThetaVue - Options Portfolio Management',
-  description: 'Plan Smart. Profit Consistently.',
+export const metadata: Metadata = {
+  title: "ThetaVue",
+  description: "Options portfolio management for retail traders",
 }
 
 export default function RootLayout({
@@ -16,17 +16,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ClientWrapper>
           {children}
-          <Toaster />
-        </ThemeProvider>
+        </ClientWrapper>
       </body>
     </html>
   )

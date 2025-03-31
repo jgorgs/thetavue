@@ -1,5 +1,3 @@
-"use client"
-
 import { getServerUser } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 
