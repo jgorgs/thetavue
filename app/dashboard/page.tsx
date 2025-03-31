@@ -9,9 +9,11 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="container py-8">
-      <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
-      <p>Welcome back, {user.email}</p>
+    <div className="space-y-4 p-8">
+      <h1 className="text-2xl font-bold">Welcome back, {user.email}</h1>
+      <p className="text-muted-foreground">
+        This is your dashboard. You can view your positions, trades, and settings here.
+      </p>
     </div>
   )
 }
