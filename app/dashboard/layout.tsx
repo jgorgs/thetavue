@@ -1,7 +1,7 @@
 import type React from "react"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-import { currentUser } from "@clerk/nextjs"
+import { currentUser } from "@clerk/nextjs/server" // Updated import path
 import { redirect } from "next/navigation"
 
 export default async function DashboardLayout({
@@ -28,7 +28,7 @@ export default async function DashboardLayout({
         </div>
       </div>
     )
-  } catch (error) {
+  } catch (error: any) { // Added type annotation for error
     console.error("Dashboard layout error:", {
       message: error.message,
       stack: error.stack,
@@ -51,4 +51,3 @@ export default async function DashboardLayout({
     )
   }
 }
-
