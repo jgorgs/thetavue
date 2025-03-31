@@ -29,11 +29,12 @@ export default clerkMiddleware(async (auth, req) => {
   }
 }, { debug: true });
 
+// Use a simpler matcher pattern that Next.js will accept
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files
-    '/((?!_next|[^?]*\\.(jpg|jpeg|gif|png|svg|ico|css|js)).*)',
+    // Skip Next.js internals
+    "/((?!_next/static|_next/image|favicon.ico).*)",
     // Include API routes
-    '/(api|trpc)(.*)',
+    "/(api|trpc)(.*)"
   ],
 };
