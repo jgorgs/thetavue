@@ -15,15 +15,15 @@ export default authMiddleware({
     "/assets(.*)",
   ],
   ignoredRoutes: [
-    "/((?!api|trpc))(_next.*|.+.[w]+$)",
+    "/_next/static/(.*)",
+    "/favicon.ico",
     "/api/health",
-    "/_next/static(.*)",
   ],
 })
 
 export const config = {
   matcher: [
-    "/((?!api|_next|.*\\.).*)/?$",
+    "/((?!_next|api|.*\\.).*)",
     "/dashboard(.*)",
   ],
 }
