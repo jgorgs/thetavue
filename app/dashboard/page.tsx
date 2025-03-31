@@ -1,17 +1,37 @@
-import { auth } from "@clerk/nextjs"
-import { redirect } from "next/navigation"
+"use client"
 
-export default async function DashboardPage() {
-  const { userId } = auth()
+import { useAuth } from "@clerk/nextjs"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+
+export default function DashboardPage() {
+  const { isLoaded, userId } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      router.push("/sign-in")
+    }
+  }, [isLoaded, userId, router])
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">Loading...</h2>
+        </div>
+      </div>
+    )
+  }
 
   if (!userId) {
-    redirect("/sign-in")
+    return null
   }
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p>You are signed in!</p>
+      <p>You are signed in with ID: {userId}</p>
     </div>
   )
 }
